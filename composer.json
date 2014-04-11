@@ -1,0 +1,13 @@
+{
+    "name": "appsco/component-share",
+    "description": "Common shared stuf",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.2"
+    },
+    "autoload": {
+        "psr-0": { "BWC\\Share": "src/" }
+    },
+    "minimum-stability": "stable"
+}
