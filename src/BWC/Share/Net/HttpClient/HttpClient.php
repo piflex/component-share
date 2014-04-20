@@ -14,7 +14,10 @@ class HttpClient implements HttpClientInterface
     protected $_accept;
 
     private $_header;
+
     private $_statusCode;
+
+    private $_errorText;
 
 
     function __construct() {
@@ -38,6 +41,12 @@ class HttpClient implements HttpClientInterface
         return $this->_statusCode;
     }
 
+    /**
+     * @return string
+     */
+    function getErrorText() {
+        return $this->_errorText;
+    }
     /**
      * @return string
      */
@@ -109,13 +118,13 @@ class HttpClient implements HttpClientInterface
         $this->_header = null;
         $header = $arrHeaders ?: array();
         if ($this->_accept && !isset($header['Accept']))
-            $header['Accept'] = $this->_accept;
+            $header[] = 'Accept: '.$this->_accept;
         if ($queryData) {
             $url = rtrim($url, '?');
             $url .= '?'.http_build_query($queryData);
         }
         if ($contentType) {
-            $header['Content-Type'] = $contentType;
+            $header[] = 'Content-Type: '.$contentType;
         }
         if ($postData) {
             if (is_array($postData)) {
@@ -128,8 +137,8 @@ class HttpClient implements HttpClientInterface
                 $postData = (string)$postData;
             }
             curl_setopt($this->_curl, CURLOPT_POSTFIELDS, $postData);
-            $header['Content-Length'] = strlen($postData);
-            $header['Content-Type'] = $contentType ?: ContentType::FORM_URLENCODED;
+            $header[] = 'Content-Length: '.strlen($postData);
+            $header[] = 'Content-Type: '.($contentType ?: ContentType::FORM_URLENCODED);
         }
         curl_setopt($this->_curl, CURLOPT_URL, $url);
         curl_setopt($this->_curl, CURLOPT_CUSTOMREQUEST, $method);
@@ -141,6 +150,7 @@ class HttpClient implements HttpClientInterface
         $this->_header = substr($response, 0, $header_size);
         $body = substr($response, $header_size);
         $this->_statusCode = curl_getinfo($this->_curl, CURLINFO_HTTP_CODE);
+        $this->_errorText = curl_error($this->_curl);
         return $body;
     }
 

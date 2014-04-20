@@ -24,6 +24,11 @@ interface HttpClientInterface
     /**
      * @return string
      */
+    function getErrorText();
+
+        /**
+     * @return string
+     */
     function getHeader();
 
 
