@@ -30,18 +30,9 @@ class GenerateModelCommand extends ContainerAwareCommand
 
         $bundle = $this->pickBundle($dialog, $output);
 
-        //$modelName = $this->getModelName($dialog, $output, $bundle);
-        $modelName = 'Pera';
+        $modelName = $this->getModelName($dialog, $output, $bundle);
 
-        //$fields = $this->getFields($dialog, $output);
-        $fields = array(
-            'id' => 'int',
-            'name' => 'string',
-            'active' => 'bool',
-            'amount' => 'float',
-            'createdBy' => 'User',
-            'createdOn' => '\DateTime'
-        );
+        $fields = $this->getFields($dialog, $output);
 
         $this->confirm($dialog, $output, $bundle, $modelName, $fields);
 
@@ -54,6 +45,7 @@ class GenerateModelCommand extends ContainerAwareCommand
         $output->writeln('');
         $this->generateModelInterface($output, $bundle, $modelName, $fields);
         $this->generateModel($output, $bundle, $modelName, $fields);
+        $this->generateEntity($output, $bundle, $modelName, $fields);
         $this->generateManagerInterface($output, $bundle, $modelName, $fields);
         $this->generateManager($output, $bundle, $modelName, $fields);
         $this->generateOrmManager($output, $bundle, $modelName, $fields);
@@ -67,6 +59,10 @@ class GenerateModelCommand extends ContainerAwareCommand
 
         $txtFields = '';
         foreach ($fields as $name=>$type) {
+            if ($name == 'id') {
+                continue;
+            }
+
             $n = preg_replace_callback(
                 "|(.+)([A-Z])|",
                 function($matches) {
@@ -94,6 +90,16 @@ class GenerateModelCommand extends ContainerAwareCommand
 EOT;
         }
 
+        $mn = preg_replace_callback(
+            "|(.+)([A-Z])|",
+            function($matches) {
+                return $matches[1].'_'.strtolower($matches[2]);
+            },
+            $modelName
+        );
+
+        $ns = $bundle->getNamespace();
+
         $txt = <<<EOT
 <?xml version="1.0" encoding="UTF-8"?>
 <doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
@@ -101,14 +107,14 @@ EOT;
           xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                     http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity  name="Appsco\My\Ket\CoreBundle\Entity\Account" table="my_account">
+    <entity  name="{$ns}\Entity\\{$modelName}" table="{$mn}">
 
         <!-- unique-constraints>
             <unique-constraint name="UDX_entity_first" columns="foo,bar"/>
             <unique-constraint name="UDX_entity_second" columns="bar,jazz"/>
         </unique-constraints -->
 
-        <id name="id" column="id" type="bigint">
+        <id name="id" column="id" type="integer">
             <generator strategy="AUTO" />
         </id>
 
@@ -184,7 +190,7 @@ class {$modelName}Manager extends \\$ns\\Service\\Model\\{$modelName}\\{$modelNa
      * @param EntityManager \$entityManager
      * @param string|null \$class
      */
-    public function __construct(EntityManager \$entityManager, \$class)
+    public function __construct(EntityManager \$entityManager, \$class = null)
     {
         parent::__construct();
 
@@ -461,10 +467,41 @@ $txtMethods
 }
 EOT;
 
+        $dir = sprintf("%s/Model", $bundle->getPath());
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
         $fn = sprintf("%s/Model/%sInterface.php", $bundle->getPath(), $modelName);
         file_put_contents($fn, $txt);
     }
 
+
+    protected function generateEntity(OutputInterface $output, BundleInterface $bundle, $modelName, array $fields)
+    {
+        $output->writeln(sprintf("Generating Entity/%s.php", $modelName));
+
+        $ns = $bundle->getNamespace();
+
+        $txt = <<<EOT
+<?php
+
+namespace $ns\\Entity;
+
+class $modelName extends \\{$ns}\\Model\\{$modelName}
+{
+
+}
+EOT;
+
+        $dir = sprintf("%s/Entity", $bundle->getPath());
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
+
+        $fn = sprintf("%s/Entity/%s.php", $bundle->getPath(), $modelName);
+        file_put_contents($fn, $txt);
+    }
 
     protected function generateModel(OutputInterface $output, BundleInterface $bundle, $modelName, array $fields)
     {
@@ -472,9 +509,7 @@ EOT;
 
         $txtFields = '';
         foreach ($fields as $name=>$type) {
-            $txtFields .= "    /**\n";
-            $txtFields .= "     * @var $type\n";
-            $txtFields .= "     */\n";
+            $txtFields .= "    /** @var $type */\n";
             $txtFields .= "    protected \${$name};\n";
             $txtFields .= "    \n";
         }
@@ -502,7 +537,7 @@ EOT;
 
 namespace $ns\\Model;
 
-class $modelName implements {$modelName}Interface
+abstract class $modelName implements {$modelName}Interface
 {
 $txtFields
 
@@ -510,6 +545,11 @@ $txtFields
 $txtMethods
 }
 EOT;
+
+        $dir = sprintf("%s/Model", $bundle->getPath());
+        if (!is_dir($dir)) {
+            mkdir($dir, 0777, true);
+        }
 
         $fn = sprintf("%s/Model/%s.php", $bundle->getPath(), $modelName);
         file_put_contents($fn, $txt);
