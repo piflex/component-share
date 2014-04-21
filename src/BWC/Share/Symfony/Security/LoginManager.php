@@ -26,7 +26,7 @@ class LoginManager
 
 
 
-    function __construct(
+    public function __construct(
         SecurityContextInterface $securityContext,  // @security.context
         $providerKey,                               // main - firewall name
         SessionInterface $session,                  // @session
@@ -40,17 +40,24 @@ class LoginManager
 
 
 
-    function login($user) {
+    public function login($user, array $attributes = null)
+    {
         if ($user instanceof UserInterface) {
             $token = new UsernamePasswordToken($user, null, $this->_providerKey, $user->getRoles());
         } else {
             $token = new AnonymousToken($this->_providerKey, $user ?: 'anon.');
         }
+
+        if ($attributes) {
+            $token->setAttributes($attributes);
+        }
+
         $this->loginToken($token);
     }
 
 
-    function loginToken(TokenInterface $token) {
+    public function loginToken(TokenInterface $token)
+    {
         $this->_securityContext->setToken($token);
         $this->_session->set($this->_sessionAuthKey, serialize($token));
     }
@@ -59,7 +66,8 @@ class LoginManager
     /**
      * @return null|TokenInterface
      */
-    function getToken() {
+    public function getToken()
+    {
         return $this->_securityContext->getToken();
     }
 
