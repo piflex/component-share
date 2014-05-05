@@ -107,7 +107,7 @@ EOT;
           xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                     http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
 
-    <entity  name="{$ns}\Entity\\{$modelName}" table="{$mn}">
+    <entity name="{$ns}\Entity\\{$modelName}" table="{$mn}">
 
         <!-- unique-constraints>
             <unique-constraint name="UDX_entity_first" columns="foo,bar"/>
@@ -574,7 +574,7 @@ EOT;
         $txtFields = '';
         $txtFields .= "    /**\n";
         $txtFields .= "     * @param $type \$value\n";
-        $txtFields .= "     * @return {$modelName}|\$this\n";
+        $txtFields .= "     * @return {$modelName}Interface|\$this\n";
         $txtFields .= "     */\n";
         $txtFields .= "    public function set{$n}({$s}\$value){$extra}\n";
 
