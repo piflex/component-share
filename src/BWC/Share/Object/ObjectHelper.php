@@ -21,11 +21,22 @@ final class ObjectHelper
         foreach ($fromVars as $prop=>$value) {
             if (array_key_exists($prop, $toVars)) {
                 $to->$prop = $value;
+            } else {
+                $methodName = 'set'.ucfirst($prop);
+                if (method_exists($to, $methodName)) {
+                    $to->{$methodName}($value);
+                }
             }
             if ($stripPrefix && strpos($prop, $stripPrefix) === 0) {
                 $p = substr($prop, strlen($stripPrefix));
                 if (array_key_exists($p, $toVars)) {
                     $to->$p = $value;
+                    unset($toVars[$p]);
+                } else {
+                    $methodName = 'set'.ucfirst($prop);
+                    if (method_exists($to, $methodName)) {
+                        $to->{$methodName}($value);
+                    }
                     unset($toVars[$p]);
                 }
             }
