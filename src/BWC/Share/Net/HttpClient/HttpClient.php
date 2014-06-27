@@ -35,6 +35,28 @@ class HttpClient implements HttpClientInterface
     }
 
     /**
+     * @param $path
+     * @return void
+     */
+    public function setCaPath($path)
+    {
+        if ($path) {
+            curl_setopt($this->_curl, CURLOPT_CAPATH, $path);
+        }
+    }
+
+    /**
+     * @param $file
+     * @return void
+     */
+    public function setCaFile($file)
+    {
+        if ($file) {
+            curl_setopt($this->_curl, CURLOPT_CAINFO, $file);
+        }
+    }
+
+    /**
      * @return int
      */
     function getStatusCode() {

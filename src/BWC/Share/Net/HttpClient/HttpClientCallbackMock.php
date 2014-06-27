@@ -31,6 +31,25 @@ class HttpClientCallbackMock implements HttpClientInterface
     }
 
     /**
+     * @param $path
+     * @return void
+     */
+    public function setCaPath($path)
+    {
+
+    }
+
+    /**
+     * @param $file
+     * @return void
+     */
+    public function setCaFile($file)
+    {
+
+    }
+
+
+    /**
      * @return int
      */
     function getStatusCode() {

@@ -8,28 +8,40 @@ interface HttpClientInterface
     /**
      * @return int
      */
-    function getTimeoutMS();
+    public function getTimeoutMS();
 
     /**
      * @param int $milliseconds
      * @return void
      */
-    function setTimeoutMS($milliseconds);
+    public function setTimeoutMS($milliseconds);
+
+    /**
+     * @param $path
+     * @return void
+     */
+    public function setCaPath($path);
+
+    /**
+     * @param $file
+     * @return void
+     */
+    public function setCaFile($file);
 
     /**
      * @return int
      */
-    function getStatusCode();
+    public function getStatusCode();
 
     /**
      * @return string
      */
-    function getErrorText();
+    public function getErrorText();
 
         /**
      * @return string
      */
-    function getHeader();
+    public function getHeader();
 
 
     /**
@@ -37,14 +49,14 @@ interface HttpClientInterface
      * @param string $password
      * @return void
      */
-    function setCredentials($username, $password);
+    public function setCredentials($username, $password);
 
 
     /**
      * @param string $type   mime type for Accept http header, like text/xml or application/json
      * @return void
      */
-    function accept($type);
+    public function accept($type);
 
     /**
      * @param string $url
@@ -52,7 +64,7 @@ interface HttpClientInterface
      * @param array $arrHeaders
      * @return string
      */
-    function get($url, array $queryData = array(), array $arrHeaders = null);
+    public function get($url, array $queryData = array(), array $arrHeaders = null);
 
 
     /**
@@ -63,7 +75,7 @@ interface HttpClientInterface
      * @param array $arrHeaders
      * @return string
      */
-    function post($url, array $queryData = array(), $postData, $contentType = null, array $arrHeaders = null);
+    public function post($url, array $queryData = array(), $postData, $contentType = null, array $arrHeaders = null);
 
     /**
      * @param string $url
@@ -71,7 +83,7 @@ interface HttpClientInterface
      * @param array $arrHeaders
      * @return string
      */
-    function delete($url, array $queryData = array(), array $arrHeaders = null);
+    public function delete($url, array $queryData = array(), array $arrHeaders = null);
 
 
     /**
@@ -83,6 +95,6 @@ interface HttpClientInterface
      * @param array $arrHeaders
      * @return string
      */
-    function request($url, $method, array $queryData, $postData, $contentType = null, array $arrHeaders = null);
+    public function request($url, $method, array $queryData, $postData, $contentType = null, array $arrHeaders = null);
 
 }
