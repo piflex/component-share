@@ -57,6 +57,21 @@ class HttpClient implements HttpClientInterface
     }
 
     /**
+     * @param bool $value
+     * @return void
+     */
+    public function looseSslCheck($value)
+    {
+        if ($value) {
+            curl_setopt($this->_curl, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($this->_curl, CURLOPT_SSL_VERIFYHOST, 0);
+        } else {
+            curl_setopt($this->_curl, CURLOPT_SSL_VERIFYPEER, true);
+            curl_setopt($this->_curl, CURLOPT_SSL_VERIFYHOST, 2);
+        }
+    }
+
+    /**
      * @return int
      */
     function getStatusCode() {

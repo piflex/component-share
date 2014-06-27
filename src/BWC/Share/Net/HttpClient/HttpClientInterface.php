@@ -34,6 +34,12 @@ interface HttpClientInterface
     public function getStatusCode();
 
     /**
+     * @param bool $value
+     * @return void
+     */
+    public function looseSslCheck($value);
+
+    /**
      * @return string
      */
     public function getErrorText();
