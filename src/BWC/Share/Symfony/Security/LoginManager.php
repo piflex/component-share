@@ -40,12 +40,16 @@ class LoginManager
 
 
 
-    public function login($user, array $attributes = null)
+    public function login($user, array $attributes = null, $providerKey = null)
     {
+        if (!$providerKey) {
+            $providerKey = $this->_providerKey;
+        }
+
         if ($user instanceof UserInterface) {
-            $token = new UsernamePasswordToken($user, null, $this->_providerKey, $user->getRoles());
+            $token = new UsernamePasswordToken($user, null, $providerKey, $user->getRoles());
         } else {
-            $token = new AnonymousToken($this->_providerKey, $user ?: 'anon.');
+            $token = new AnonymousToken($providerKey, $user ?: 'anon.');
         }
 
         if ($attributes) {
