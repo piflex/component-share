@@ -119,7 +119,8 @@ class HttpClient implements HttpClientInterface
      * @param array $arrHeaders
      * @return string
      */
-    function get($url, array $queryData = array(), array $arrHeaders = null) {
+    function get($url, array $queryData = array(), array $arrHeaders = array()) {
+        $arrHeaders[] = 'Content-length: 0';
         $result = $this->request($url, 'GET', $queryData, null, null, $arrHeaders);
         return $result;
     }
@@ -154,6 +155,7 @@ class HttpClient implements HttpClientInterface
     function request($url, $method, array $queryData, $postData, $contentType = null, array $arrHeaders = null) {
         $this->_header = null;
         $header = $arrHeaders ?: array();
+        $header[] = sprintf('Host: %s', parse_url($url, PHP_URL_HOST));
         if ($this->_accept && !isset($header['Accept']))
             $header[] = 'Accept: '.$this->_accept;
         if ($queryData) {
