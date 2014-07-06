@@ -35,6 +35,17 @@ interface ConfigInterface
     public function getType();
 
     /**
+     * @param \DateTime|null $expiresAt
+     * @return $this|Config
+     */
+    public function setExpiresAt(\DateTime $expiresAt = null);
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getExpiresAt();
+
+    /**
      * @param array|bool|int|object|string $value
      * @return $this|ConfigInterface
      */

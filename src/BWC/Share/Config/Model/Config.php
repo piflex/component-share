@@ -10,6 +10,9 @@ class Config implements ConfigInterface
     /** @var  string */
     protected $type;
 
+    /** @var  \DateTime|null */
+    protected $expiresAt;
+
     /** @var  bool|int|string|array|object */
     protected $value;
 
@@ -50,6 +53,24 @@ class Config implements ConfigInterface
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @param \DateTime|null $expiresAt
+     * @return $this|Config
+     */
+    public function setExpiresAt(\DateTime $expiresAt = null)
+    {
+        $this->expiresAt = $expiresAt;
+        return $this;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getExpiresAt()
+    {
+        return $this->expiresAt;
     }
 
     /**

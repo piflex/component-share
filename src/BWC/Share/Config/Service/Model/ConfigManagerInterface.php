@@ -23,6 +23,13 @@ interface ConfigManagerInterface
     public function delete(ConfigInterface $config);
 
     /**
+     * @param \DateTime $now
+     * @param int|null $limit
+     * @return int
+     */
+    public function deleteExpired(\DateTime $now, $limit = null);
+
+    /**
      * @param string $name
      * @return ConfigInterface|null
      */

@@ -6,11 +6,17 @@
 
     <entity name="Company\Product\AcmeBundle\Entity\Config" table="table_name_config">
 
+        <indexes>
+            <index columns="expires_at" name="IDX_table_name_config_expires_at"/>
+        </indexes>
+
         <id name="name" column="name" type="string" length="200">
             <generator strategy="NONE" />
         </id>
 
         <field name="type" column="type" type="string" nullable="false" length="20" />
+
+        <field name="expiresAt" column="expires_at" type="datetime" nullable="true" />
 
         <field name="value" column="value" type="text" nullable="true" />
 

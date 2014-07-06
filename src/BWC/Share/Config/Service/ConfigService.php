@@ -4,6 +4,7 @@ namespace BWC\Share\Config\Service;
 
 use BWC\Share\Config\Model\ConfigInterface;
 use BWC\Share\Config\Service\Model\ConfigManagerInterface;
+use BWC\Share\Sys\DateTime;
 
 class ConfigService implements ConfigServiceInterface
 {
@@ -11,7 +12,7 @@ class ConfigService implements ConfigServiceInterface
     protected $configManager;
 
 
-    /** @var array   name => mixed */
+    /** @var array   name => [mixed, expiresAt] */
     private $valueCache = array();
 
 
@@ -33,33 +34,52 @@ class ConfigService implements ConfigServiceInterface
     {
         if (false == array_key_exists($name, $this->valueCache)) {
             $dbConfig = $this->configManager->getByName($name);
-            $this->valueCache[$name] = $this->decodeValue($dbConfig);
+            $this->valueCache[$name] = array(
+                $this->decodeValue($dbConfig),
+                $dbConfig && $dbConfig->getExpiresAt() ? $dbConfig->getExpiresAt()->getTimestamp() : null
+            );
         }
 
-        return $this->valueCache[$name];
+        $data = @$this->valueCache[$name];
+
+        if ($data) {
+            if ($data[1] > DateTime::now()) {
+                return $data[0];
+            } else if (isset($dbConfig)) {
+                $this->configManager->delete($dbConfig);
+            }
+        }
+
+        return null;
     }
 
     /**
      * @param string $name
      * @param bool|int|float|string|array|object $value
      * @param string $type
+     * @param \DateTime|null $expiresAt
      * @return void
      */
-    public function set($name, $value, $type = ConfigInterface::TYPE_STRING)
+    public function set($name, $value, $type = ConfigInterface::TYPE_STRING, \DateTime $expiresAt = null)
     {
         $config = $this->configManager->getByName($name);
 
         if (null == $config) {
-            $config = $this->configManager->create();
-            $config->setName($name)
-                ->setType($type);
+            $config = $this->configManager->create()
+                ->setName($name)
+                ->setType($type)
+                ->setExpiresAt($expiresAt)
+            ;
         }
 
         $this->encodeValue($value, $config);
 
         $this->configManager->update($config);
 
-        $this->valueCache[$name] = $value;
+        $this->valueCache[$name] = array(
+            $value,
+            $expiresAt ? $expiresAt->getTimestamp() : null
+        );
     }
 
     /**
@@ -80,6 +100,14 @@ class ConfigService implements ConfigServiceInterface
         return true;
     }
 
+    /**
+     * @param int|null $limit
+     * @return int
+     */
+    public function deleteExpired($limit = null)
+    {
+        return $this->configManager->deleteExpired(DateTime::now(), $limit);
+    }
 
     /**
      * Returns decoded value from the config object
