@@ -43,7 +43,7 @@ class ConfigService implements ConfigServiceInterface
         $data = @$this->valueCache[$name];
 
         if ($data) {
-            if ($data[1] > DateTime::now()) {
+            if (null == $data[1] || $data[1] > DateTime::now()) {
                 return $data[0];
             } else if (isset($dbConfig)) {
                 $this->configManager->delete($dbConfig);
