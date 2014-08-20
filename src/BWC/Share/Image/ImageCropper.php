@@ -63,12 +63,17 @@ class ImageCropper
     {
         if (null === $this->image) {
             throw new \LogicException(
-                'You have to load an image before croping it. 
+                'You have to load an image before cropping it.
                 Use loadImageFromString or loadImageFromFile'
             );
         }
 
         $destination = imagecreatetruecolor($targetWidth, $targetHeight);
+        imagealphablending($destination, false);
+        imagesavealpha($destination, true);
+        $transparent = imagecolorallocatealpha($destination, 255, 255, 255, 127);
+        imagefill($destination, 0, 0, $transparent);
+
         imagecopyresampled(
             $destination,
             $this->image,
