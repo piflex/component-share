@@ -9,6 +9,8 @@ class ImageResizer
     public function fromString($image)
     {
         $this->_image = imagecreatefromstring($image);
+        imagealphablending($this->_image, false);
+        imagesavealpha($this->_image, true);
     }
 
     public function toString()
@@ -57,4 +59,4 @@ class ImageResizer
     {
         return $this->_image ? imagesy($this->_image) : null;
     }
-} 
+}
