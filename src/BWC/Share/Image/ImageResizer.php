@@ -24,6 +24,16 @@ class ImageResizer
 
     public function scaleToFit($width, $height)
     {
+        $this->scale($width, $height, true);
+    }
+
+    public function scaleToCover($width, $height)
+    {
+        $this->scale($width, $height, false);
+    }
+
+    protected function scale($width, $height, $toFit)
+    {
         if (null === $this->_image) return;
 
         $rawWidth  = $this->_getWidth();
@@ -32,7 +42,11 @@ class ImageResizer
         $widthOver  = $rawWidth / $width;
         $heightOver = $rawHeight / $height;
 
-        $scalingFactor = max($widthOver, $heightOver);
+        if ($toFit) {
+            $scalingFactor = max($widthOver, $heightOver);
+        } else {
+            $scalingFactor = min($widthOver, $heightOver);
+        }
 
         if ($scalingFactor > 1) {
             $destWidth  = $rawWidth / $scalingFactor;
