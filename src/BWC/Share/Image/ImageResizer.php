@@ -22,17 +22,23 @@ class ImageResizer
         return $contents;
     }
 
-    public function scaleToFit($width, $height)
+    public function scaleToFit($width, $height, $force = false)
     {
-        $this->scale($width, $height, true);
+        $this->scale($width, $height, true, $force);
     }
 
-    public function scaleToCover($width, $height)
+    public function scaleToCover($width, $height, $force = false)
     {
-        $this->scale($width, $height, false);
+        $this->scale($width, $height, false, $force);
     }
 
-    protected function scale($width, $height, $toFit)
+    /**
+     * @param int $width Target width
+     * @param int $height Target height
+     * @param bool $toFit If true, image fill fit to given dimensions, if false, it will cover them
+     * @param bool $force If true, image will be resized even if target dimensions are larger than original
+     */
+    protected function scale($width, $height, $toFit, $force)
     {
         if (null === $this->_image) return;
 
@@ -48,7 +54,7 @@ class ImageResizer
             $scalingFactor = min($widthOver, $heightOver);
         }
 
-        if ($scalingFactor > 1) {
+        if ($scalingFactor > 1 || $force) {
             $destWidth  = $rawWidth / $scalingFactor;
             $destHeight = $rawHeight / $scalingFactor;
 
