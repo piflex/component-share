@@ -91,7 +91,15 @@ class Script
         $options['root-dir'] = $rootDir;
         $options['app-dir-full'] = $rootDir.DIRECTORY_SEPARATOR.$options['symfony-app-dir'];
         $options['web-dir-full'] = $rootDir.DIRECTORY_SEPARATOR.$options['symfony-web-dir'];
-        $options['vendor-dir-full'] = $rootDir.DIRECTORY_SEPARATOR.$options['vendor-dir'];
+
+        if ('/' == substr($options['vendor-dir'], 0, 1) ||
+            ':' == substr($options['vendor-dir'], 1, 1)
+        ) {
+            $options['vendor-dir-full'] = $options['vendor-dir'];
+        } else {
+            $options['vendor-dir-full'] = $rootDir.DIRECTORY_SEPARATOR.$options['vendor-dir'];
+        }
+
         return $options;
     }
 
