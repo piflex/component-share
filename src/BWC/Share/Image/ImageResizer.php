@@ -2,8 +2,11 @@
 
 namespace BWC\Share\Image;
 
-class ImageResizer
+class ImageResizer extends ImageManipulator
 {
+    /**
+     * @var resource
+     */
     private $_image;
 
     public function fromString($image)
@@ -13,13 +16,9 @@ class ImageResizer
         imagesavealpha($this->_image, true);
     }
 
-    public function toString()
+    public function toString($format = self::FORMAT_PNG)
     {
-        ob_start();
-        imagepng($this->_image);
-        $contents = ob_get_clean();
-
-        return $contents;
+        return $this->formatImageData($this->_image, $format);
     }
 
     public function scaleToFit($width, $height, $force = false)

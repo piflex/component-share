@@ -2,11 +2,8 @@
 
 namespace BWC\Share\Image;
 
-class ImageCropper
+class ImageCropper extends ImageManipulator
 {
-    const FORMAT_JPG = 'jpg';
-    const FORMAT_PNG = 'png';
-
     /**
      * @var resource
      */
@@ -16,16 +13,6 @@ class ImageCropper
      * @var resource
      */
     protected $cropped;
-
-    /**
-     * @var array
-     */
-    protected $formats;
-
-    public function __construct()
-    {
-        $this->initializeFormatCallables();
-    }
 
     /**
      * Loads image from string
@@ -117,43 +104,5 @@ class ImageCropper
     public function saveCroppedImageToFile($filepath, $format = self::FORMAT_PNG)
     {
         file_put_contents($filepath, $this->getCroppedImageAsString($format));
-    }
-
-    /**
-     * Initialize supported format and their callables
-     */
-    protected function initializeFormatCallables()
-    {
-        $this->formats = array(
-            self::FORMAT_PNG => 'imagepng',
-            self::FORMAT_JPG => 'imagejpeg',
-        );
-    }
-
-    /**
-     * Formats image resource data to chosen format.
-     *
-     * @param resource $data
-     * @param string $format
-     *
-     * @return string
-     *
-     * @throws \InvalidArgumentException
-     */
-    private function formatImageData($data, $format)
-    {
-        if (!isset($this->formats[$format])) {
-            throw new \InvalidArgumentException(sprintf(
-                'Unsupported format %s. Supported foramts are: %s',
-                $format,
-                implode(', ', array_keys($this->formats))
-            ));
-        }
-
-        ob_start();
-        call_user_func($this->formats[$format], $data);
-        $formatted = ob_get_clean();
-
-        return $formatted;
     }
 }
