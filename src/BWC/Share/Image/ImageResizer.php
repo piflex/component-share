@@ -2,8 +2,11 @@
 
 namespace BWC\Share\Image;
 
-class ImageResizer
+class ImageResizer extends ImageManipulator
 {
+    /**
+     * @var resource
+     */
     private $_image;
 
     public function fromString($image)
@@ -13,43 +16,28 @@ class ImageResizer
         imagesavealpha($this->_image, true);
     }
 
-    public function toString()
+    public function toString($format = self::FORMAT_PNG)
     {
-        ob_start();
-        imagepng($this->_image);
-        $contents = ob_get_clean();
-
-        return $contents;
+        return $this->formatImageData($this->_image, $format);
     }
 
-    /**
-     * @param int $width
-     * @param int $height
-     * @param bool|string $force If true/'force', image will be forced to resize even if it's larger then original
-     *                           If 'frame', image will contain a transparent frame if larger then original
-     *                           If false, image will not be resized if it's larger than original
-     *                             
-     */
     public function scaleToFit($width, $height, $force = false)
     {
-        $this->scale($width, $height, true, (bool) $force, 'frame' === $force);
+        $this->scale($width, $height, true, $force);
     }
 
     public function scaleToCover($width, $height, $force = false)
     {
-        $this->scale($width, $height, false, $force, false);
+        $this->scale($width, $height, false, $force);
     }
 
     /**
      * @param int $width Target width
      * @param int $height Target height
      * @param bool $toFit If true, image fill fit to given dimensions, if false, it will cover them
-     * @param bool $force If true, image will be resized even if target dimensions are larger than original.
-     * @param bool $frame If true, image will contain a transparent frame if 
-     *                    toFit is enabled and it's larger than original
-     *                            
+     * @param bool $force If true, image will be resized even if target dimensions are larger than original
      */
-    protected function scale($width, $height, $toFit, $force, $frame)
+    protected function scale($width, $height, $toFit, $force)
     {
         if (null === $this->_image) return;
 
@@ -65,43 +53,20 @@ class ImageResizer
             $scalingFactor = min($widthOver, $heightOver);
         }
 
-        if ($scalingFactor < 1 && $toFit && $force && $frame) {
-            $destImage = $this->_createEmptyImage($width, $height);
-
-            imagecopyresampled(
-                $destImage, 
-                $this->_image,
-                ($width - $rawWidth) / 2, 
-                ($height - $rawHeight) / 2, 
-                0, 
-                0, 
-                $rawWidth, 
-                $rawHeight, 
-                $rawWidth, 
-                $rawHeight
-            );                        
-
-            $this->_image = $destImage;
-        } elseif ($scalingFactor > 1 || $force) {
+        if ($scalingFactor > 1 || $force) {
             $destWidth  = $rawWidth / $scalingFactor;
             $destHeight = $rawHeight / $scalingFactor;
-            $destImage = $this->_createEmptyImage($destWidth, $destHeight);
+
+            $destImage = imagecreatetruecolor($destWidth, $destHeight);
+            imagealphablending($destImage, false);
+            imagesavealpha($destImage, true);
+            $transparent = imagecolorallocatealpha($destImage, 255, 255, 255, 127);
+            imagefill($destImage, 0, 0, $transparent);
 
             imagecopyresampled($destImage, $this->_image, 0, 0, 0, 0, $destWidth, $destHeight, $rawWidth, $rawHeight);
 
             $this->_image = $destImage;
         }
-    }
-
-    protected function _createEmptyImage($width, $height)
-    {
-        $image = imagecreatetruecolor($width, $height);
-        imagealphablending($image, false);
-        imagesavealpha($image, true);
-        $transparent = imagecolorallocatealpha($image, 255, 255, 255, 127);
-        imagefill($image, 0, 0, $transparent);        
-
-        return $image;
     }
 
     protected function _getWidth()
