@@ -16,9 +16,9 @@ class ImageResizer extends ImageManipulator
         imagesavealpha($this->_image, true);
     }
 
-    public function toString($format = self::FORMAT_PNG)
+    public function toString($format = self::FORMAT_PNG, $quality = null)
     {
-        return $this->formatImageData($this->_image, $format);
+        return $this->formatImageData($this->_image, $format, $quality);
     }
 
     public function scaleToFit($width, $height, $force = false)
