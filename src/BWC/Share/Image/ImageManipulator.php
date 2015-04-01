@@ -33,23 +33,29 @@ class ImageManipulator
      *
      * @param resource $data
      * @param string $format
+     * @param int $quality
      *
      * @return string
      *
      * @throws \InvalidArgumentException
      */
-    protected function formatImageData($data, $format)
+    protected function formatImageData($data, $format, $quality = null)
     {
         if (!isset($this->formats[$format])) {
             throw new \InvalidArgumentException(sprintf(
-              'Unsupported format %s. Supported foramts are: %s',
+              'Unsupported format %s. Supported formats are: %s',
               $format,
               implode(', ', array_keys($this->formats))
             ));
         }
 
+        $params = array($data);
+        if (null !== $quality) {
+            $params[] = $quality;
+        }
+
         ob_start();
-        call_user_func($this->formats[$format], $data);
+        call_user_func_array($this->formats[$format], $params);
         $formatted = ob_get_clean();
 
         return $formatted;
