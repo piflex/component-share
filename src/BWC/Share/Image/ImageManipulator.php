@@ -60,4 +60,4 @@ class ImageManipulator
 
         return $formatted;
     }
-} 
+}
